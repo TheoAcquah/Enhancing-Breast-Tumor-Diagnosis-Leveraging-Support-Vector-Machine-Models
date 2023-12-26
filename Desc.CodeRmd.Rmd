@@ -1,0 +1,186 @@
+---
+title: "Project-SVM"
+author: "Theophilus B.K. Acquah"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    keep_tex: yes
+    toc: yes
+    fig_caption: yes
+    number_sections: yes
+  html_document:
+    toc: yes
+    df_print: paged
+  word_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+install.packages('tinytex')
+library(tinytex)
+#tinytex::tlmgr_install("fancyhdr")
+#tinytex::reinstall_tinytex()
+```
+
+EXPLORATORY DATA ANALYSIS
+```{r}
+
+setwd("~/Documents/CourseWork/Fall 2023/SRM 641-MACHINE LEARNING/Project")
+data <- read.csv("data.csv")
+
+head(data)
+
+str(data)
+```
+
+
+```{r}
+# Assuming 'data' is your data frame and is already loaded in R
+
+# Remove the 'id' column if it exists
+data <- data[, !names(data) %in% c("id", "ID")]
+
+# Get summary statistics for each column (excluding 'id')
+summary_stats <- summary(data)
+
+# Print the summary statistics
+summary_stats
+
+table(data$diagnosis)
+```
+
+
+
+```{r, include=FALSE}
+install.packages("ggplot2");library(ggplot2)
+install.packages("gridExtra");library(gridExtra)
+```
+
+
+```{r, include=FALSE}
+install.packages("caret");library(caret)
+install.packages("e1071");library(e1071)
+```
+
+
+```{r}
+# Assuming 'data' is already loaded into R
+# Ensure that 'data' is a data frame with the correct variables
+
+# Plot histograms for the _mean variables
+par(mfrow=c(2, 5)) # Set up the plotting area to have 2 rows and 5 columns
+hist_mean_variables <- function(data) {
+  for (var in grep("_mean$", names(data), value = TRUE)) {
+    hist(data[[var]], main=var, xlab=var, breaks=10, col='skyblue')
+  }
+}
+hist_mean_variables(data)
+
+# Plot histograms for the _se variables
+par(mfrow=c(2, 5)) # Adjust the plotting area if needed
+hist_se_variables <- function(data) {
+  for (var in grep("_se$", names(data), value = TRUE)) {
+    hist(data[[var]], main=var, xlab=var, breaks=10, col='lightgreen')
+  }
+}
+hist_se_variables(data)
+
+# Plot histograms for the _worst variables
+par(mfrow=c(2, 5)) # Adjust the plotting area if needed
+hist_worst_variables <- function(data) {
+  for (var in grep("_worst$", names(data), value = TRUE)) {
+    hist(data[[var]], main=var, xlab=var, breaks=10, col='salmon')
+  }
+}
+hist_worst_variables(data)
+
+# Reset the plotting area to default
+par(mfrow=c(1, 1))
+
+```
+
+
+
+```{r}
+# Assuming 'data' is already loaded into R
+# Ensure that 'data' is a data frame with the correct variables
+
+# Plot histograms for the _mean variables
+par(mfrow=c(2, 5)) # Set up the plotting area to have 2 rows and 5 columns
+hist_mean_variables <- function(data) {
+  for (var in grep("_mean$", names(data), value = TRUE)) {
+    hist(data[[var]], main=var, xlab=var, breaks=10, col='skyblue')
+  }
+}
+hist_mean_variables(data)
+
+# Plot histograms for the _se variables
+par(mfrow=c(2, 5)) # Adjust the plotting area if needed
+hist_se_variables <- function(data) {
+  for (var in grep("_se$", names(data), value = TRUE)) {
+    hist(data[[var]], main=var, xlab=var, breaks=10, col='lightgreen')
+  }
+}
+hist_se_variables(data)
+
+# Plot histograms for the _worst variables
+par(mfrow=c(2, 5)) # Adjust the plotting area if needed
+hist_worst_variables <- function(data) {
+  for (var in grep("_worst$", names(data), value = TRUE)) {
+    hist(data[[var]], main=var, xlab=var, breaks=10, col='salmon')
+  }
+}
+hist_worst_variables(data)
+
+# Reset the plotting area to default
+par(mfrow=c(1, 1))
+
+```
+
+
+
+
+```{r, include=FALSE}
+# Correcting the variable names and rerunning the correlation matrix plot
+install.packages("corrplot");library(corrplot)
+```
+
+
+```{r, fig.width=5, fig.height=4}
+# Simulating some data for demonstration (you should use your actual data frame here)
+set.seed(123) # for reproducibility
+
+# Assuming 'data' is your data frame and is already loaded in R
+
+# Remove the 'id' column if it exists
+data <- data[, !names(data) %in% c("id", "ID","diagnosis")]
+
+# Generate the correlation matrices for each group of variables
+cor_mean <- cor(data[grep("_mean$", names(data))])
+cor_se <- cor(data[grep("_se$", names(data))])
+cor_worst <- cor(data[grep("_worst$", names(data))])
+
+# Plot the correlation matrices
+# For the _mean variables
+corrplot(cor_mean, method="number", title="Mean Variables Correlation Matrix", 
+         tl.cex=0.4, tl.col="black", tl.srt=45, type="upper",diag=F,
+         col=colorRampPalette(c("#6D9EC1", "#E46726"))(200))
+
+# For the _se variables
+corrplot(cor_se, method="number", title="SE Variables Correlation Matrix", 
+         tl.cex=0.4, tl.col="black", tl.srt=45, type="upper",diag=F,
+         col=colorRampPalette(c("#6D9EC1", "#E46726"))(200))
+
+# For the _worst variables
+corrplot(cor_worst, method="number", title="Worst Variables Correlation Matrix", 
+         tl.cex=0.4, tl.col="black", tl.srt=45, type="upper",diag=F,
+         col=colorRampPalette(c("#6D9EC1", "#E46726"))(200))
+```
+
+
